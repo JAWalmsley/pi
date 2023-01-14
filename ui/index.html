@@ -1,6 +1,48 @@
 <html>
-    <head><title>Pi</title></head>
+    <head>
+        <title>Pi</title>
+        <script src="lib/quagga.min.js"></script>
+    </head>
     <body>
         Welcome to Pi!
+        <div id="qr-reader" style="width: 600px"></div>
     </body>
+    <script>
+        var UPC;
+        fetch('UPC.json')
+            .then((response) => response.json())
+            .then((json) => UPC = json);
+        Quagga.init(
+            {
+                numOfWorkers: 4,
+                inputStream: {
+                    name: 'Live',
+                    type: 'LiveStream',
+                    target: document.querySelector('#qr-reader'), // Or '#yourElement' (optional)
+                },
+                decoder: {
+                    readers: ['upc_reader'],
+                },
+            },
+            function (err) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log('Initialization finished. Ready to start');
+                Quagga.start();
+            }
+        );
+        Quagga.onDetected(function (result) {
+            var code = result.codeResult.code;
+            if(!code in UPC) {
+                return;
+            }
+            console.log(code);
+            console.log(UPC[code].company);
+            fetch("https://nftstorage.link/ipfs/" + upc[code].ipfs)
+            .than((response) => response.json())
+            .then((json) => console.log(json));
+        });
+    </script>
 </html>
