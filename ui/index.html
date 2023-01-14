@@ -5,10 +5,16 @@
     </head>
     <body>
         Welcome to Pi!
-        <div id="qr-reader" style="width: 600px"></div>
+        <div id="qr-reader" style="width: 100vw; height:70vh"></div>
+        <div>
+            <h1 id="company">Company</h1>
+            <h2 id="score">Score</h2>
+            <p id="blurb">Blurb</p>
+        </div>
     </body>
     <script>
         var UPC;
+        console.log(window.innerWidth)
         fetch('UPC.json')
             .then((response) => response.json())
             .then((json) => UPC = json);
@@ -35,14 +41,19 @@
         );
         Quagga.onDetected(function (result) {
             var code = result.codeResult.code;
-            if(!code in UPC) {
+            if(!(code in UPC)) {
+                console.log("bad read");
                 return;
             }
             console.log(code);
             console.log(UPC[code].company);
-            fetch("https://nftstorage.link/ipfs/" + upc[code].ipfs)
-            .than((response) => response.json())
-            .then((json) => console.log(json));
+            fetch("https://nftstorage.link/ipfs/" + UPC[code].ipfs)
+            .then((response) => response.json())
+            .then((json) => {
+                document.getElementById("company").innerText=json.name;
+                document.getElementById("score").innerText=json.score;
+                document.getElementById("blurb").innerText = json.blurb;
+            });
         });
     </script>
 </html>
