@@ -109,18 +109,32 @@ function App() {
 
     return (
         <div className="App">
+            <div style={{marginTop: 70, marginBottom: 50}}>
+                <Title>Pi</Title>
+            </div>
+            <QrReader id="qr-reader" />
             <header className="App-header" style={{ backgroundColor: colour }}>
                 <p>{flags}</p>
             </header>
-            <QrReader id="qr-reader"></QrReader>
         </div>
     );
 }
 
 const QrReader = styled.div`
     video {
-        height: 60%;
+        width: 50%;
+        border-radius: 15px;
+    }
+    canvas {
+        height: 1px;
     }
 `;
+
+const Title = styled.span`
+    font-size: 6.25em;
+    font-weight: 800;
+    line-height: 6.5rem;
+    color: rgb(250, 250, 250);
+;`
 
 export default App;
