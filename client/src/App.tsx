@@ -79,7 +79,13 @@ function App() {
             //             }
             //         });
             let warningIngredients = parseProductData(cacheData[code]);
-            let flagRows = [];
+            let flagRows = [
+                <>
+                    <h3>
+                        High Emission Ingredients Found: <br></br>
+                    </h3>
+                </>,
+            ];
             if (warningIngredients != null) {
                 warningIngredients.forEach((x) => {
                     flagRows.push(
@@ -89,6 +95,11 @@ function App() {
                         </>
                     );
                 });
+                flagRows.push(
+                    <a href="https://www.visualcapitalist.com/visualising-the-greenhouse-gas-impact-of-each-food/">
+                        Learn More
+                    </a>
+                );
                 setFlags(flagRows);
                 setColour('#aa3333');
                 setTimeout(() => setColour(defaultColour), 1000);

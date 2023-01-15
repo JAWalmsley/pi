@@ -10,11 +10,9 @@ fetch(
     .then((response) => response.json())
     .then((json) => {
         flaggedIngredients = json;
-        console.log(flaggedIngredients);
     });
 
 export function parseProductData(product) {
-    console.log(product);
     if (product == null) {
         return;
     }
