@@ -2,3 +2,34 @@
 .vscode/
 api/node_modules
 ui/node_modules
+
+# Tensorflow Build Artifacts
+*.pb
+*.so
+*.h
+*.dll
+*.lib
+*.obj
+
+# TensorFlow
+.tf_configure.bak
+.tf_configure.bak
+
+# Virtual Environments
+env/
+.venv/
+
+# TensorFlow
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Large Files or Binary Files
+*.h5
+*.hdf5
+*.npz
+*.ckpt
+*.pkl
