@@ -101,8 +101,8 @@ function App() {
                     </a>
                 );
                 setFlags(flagRows);
-                setColour('#aa3333');
-                setTimeout(() => setColour(defaultColour), 1000);
+                // setColour('#a55');
+                // setTimeout(() => setColour(defaultColour), 500);
             }
         });
     }, []);
