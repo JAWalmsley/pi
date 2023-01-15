@@ -1,14 +1,20 @@
-var flaggedIngredients = ['Sugar', 'Chocolate'];
+var flaggedIngredients;
 function toTitleCase(str) {
-    return str.replace(
-      /\w\S*/g,
-      function(txt) {
+    return str.replace(/\w\S*/g, function (txt) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-      }
-    );
-  }
+    });
+}
+fetch(
+    'https://nftstorage.link/ipfs/bafkreihgry4qiltkw7sxnnolao2lw7pye3iehod7higwsvxrr57gkqglty'
+)
+    .then((response) => response.json())
+    .then((json) => {
+        flaggedIngredients = json;
+        console.log(flaggedIngredients);
+    });
 
 function parseProductData(product) {
+    console.log(product);
     if (product == null) {
         return;
     }
@@ -24,8 +30,9 @@ function parseProductData(product) {
             .map((x) => x.text)
             .concat(product.product._keywords);
     }
+    console.log(returnData)
 
-    returnData.ingredients = returnData.ingredients.map(x=>toTitleCase(x))
+    returnData.ingredients = returnData.ingredients.map((x) => toTitleCase(x));
     // returnData.tags = product.product._keywords;
     var foundIngredients = returnData.ingredients.filter((value) =>
         flaggedIngredients.includes(value)

@@ -18,7 +18,7 @@
     </head>
     <body>
         <div>
-            <h1 id="flags">Flags</>
+            <h1 id="flags">Flags</h1>
         </div>
         <div id="qr-reader"></div>
     </body>
@@ -49,7 +49,6 @@
                 Quagga.start();
             }
         );
-
         var lastDetection;
         Quagga.onDetected(function (result) {
             var code = result.codeResult.code;
@@ -57,22 +56,44 @@
                 return;
             }
             lastDetection = code;
-            fetch('https://world.openfoodfacts.org/api/v0/product/' + code)
-                .then((response) => response.json())
-                .then((json) => {
-                    let warningIngredients = parseProductData(json);
-                    if (warningIngredients != null) {
-                        document.getElementById('flags').innerText =
-                            warningIngredients;
-                    }
-                });
-            // fetch('https://nftstorage.link/ipfs/' + UPC[code].ipfs)
-            //     .then((response) => response.json())
-            //     .then((json) => {
-            //         document.getElementById('company').innerText = json.name;
-            //         document.getElementById('score').innerText = json.score;
-            //         document.getElementById('blurb').innerText = json.blurb;
-            //     });
+            var cacheData = {
+                '064100389014': {
+                    status: 1,
+                    product: {
+                        _keywords: ['rice', 'Kelloggs', 'square'],
+                        ingredients: [
+                            { text: 'rice' },
+                            { text: 'sugar' },
+                            { text: 'cereal' },
+                        ],
+                        brands: 'Kellogg',
+                    },
+                },
+                '063348100900': {
+                    status: 1,
+                    product: {
+                        _keywords: [],
+                        ingredients: [
+                            { text: 'chocolate' },
+                            { text: 'palm oil' },
+                        ],
+                        brands: 'Dare',
+                    },
+                },
+            };
+            //     fetch('https://world.openfoodfacts.org/api/v0/product/' + code)
+            //         .then((response) => response.json())
+            //         .then((json) => {
+            //             let warningIngredients = parseProductData(json);
+            //             if (warningIngredients != null) {
+            //                 document.getElementById('flags').innerText =
+            //                     warningIngredients;
+            //             }
+            //         });
+            let warningIngredients = parseProductData(cacheData[code]);
+            if (warningIngredients != null) {
+                document.getElementById('flags').innerText = warningIngredients;
+            }
         });
     </script>
 </html>
