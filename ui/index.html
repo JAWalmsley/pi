@@ -2,33 +2,27 @@
     <head>
         <title>Pi</title>
         <script src="lib/quagga.min.js"></script>
+        <script src="./productSearch.js"></script>
         <style>
             @media (orientation: landscape) {
                 video {
-                    height:60%;
+                    height: 60%;
                 }
             }
             @media (orientation: portrait) {
                 video {
-                    width: 100%
+                    width: 100%;
                 }
             }
         </style>
     </head>
     <body>
         <div>
-            <h1 id="company">Company</h1>
-            <h2 id="score">Score</h2>
-            <p id="blurb">Blurb</p>
+            <h1 id="flags">Flags</>
         </div>
-        <div id="qr-reader" style=></div>
-        
+        <div id="qr-reader"></div>
     </body>
     <script>
-        var UPC;
-        fetch('UPC.json')
-            .then((response) => response.json())
-            .then((json) => (UPC = json));
         Quagga.init(
             {
                 numOfWorkers: 4,
@@ -52,26 +46,33 @@
                     console.log(err);
                     return;
                 }
-                console.log('Initialization finished. Ready to start');
                 Quagga.start();
             }
         );
 
+        var lastDetection;
         Quagga.onDetected(function (result) {
             var code = result.codeResult.code;
-            if (!(code in UPC)) {
-                console.log('bad read');
+            if (code == null || code == lastDetection) {
                 return;
             }
-            console.log(code);
-            console.log(UPC[code].company);
-            fetch('https://nftstorage.link/ipfs/' + UPC[code].ipfs)
+            lastDetection = code;
+            fetch('https://world.openfoodfacts.org/api/v0/product/' + code)
                 .then((response) => response.json())
                 .then((json) => {
-                    document.getElementById('company').innerText = json.name;
-                    document.getElementById('score').innerText = json.score;
-                    document.getElementById('blurb').innerText = json.blurb;
+                    let warningIngredients = parseProductData(json);
+                    if (warningIngredients != null) {
+                        document.getElementById('flags').innerText =
+                            warningIngredients;
+                    }
                 });
+            // fetch('https://nftstorage.link/ipfs/' + UPC[code].ipfs)
+            //     .then((response) => response.json())
+            //     .then((json) => {
+            //         document.getElementById('company').innerText = json.name;
+            //         document.getElementById('score').innerText = json.score;
+            //         document.getElementById('blurb').innerText = json.blurb;
+            //     });
         });
     </script>
 </html>
