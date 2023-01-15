@@ -1,6 +1,7 @@
 <html>
     <head>
         <title>Submit Report - Pi</title>
+        <script src="submit.js"></script>
     </head>
     <body>
         <form>
@@ -12,43 +13,11 @@
             <br />
             <input type="text" id="blurb" />
             <label for="blurb">Blurb</label>
-            <button id="submitButton" onClick="testResults(this)">Go</button>
+            <br />
+            <button id="submitButton" onClick="testResults(this)" type="button">
+                Go
+            </button>
         </form>
+        <p id="result"></p>
     </body>
-    <script>
-        document
-            .getElementById('submitButton')
-            .addEventListener('click', function (event) {
-                event.preventDefault();
-            });
-        function testResults(e) {
-            var entry = {};
-            entry.name = e.form.name.value;
-            entry.score = e.form.score.value;
-            entry.blurb = e.form.blurb.value;
-            console.log(entry);
-
-            const st = JSON.stringify(entry);
-
-            const blob = new Blob([st], { type: 'application/json' });
-
-            const file = new File([blob], 'FileName.json');
-            const options = {
-                method: 'POST',
-                headers: {
-                    accept: 'application/json',
-                    'content-type': 'multipart/form-data',
-                    'X-API-Key': 'sk_live_603155cd-2bb5-4e83-a52d-7a1772539a1a',
-                },
-                body: {
-                    filePath: "hi",
-                },
-            };
-
-            fetch('https://api.verbwire.com/v1/nft/store/file', options)
-                .then((response) => response.json())
-                .then((response) => console.log(response))
-                .catch((err) => console.error(err));
-        }
-    </script>
 </html>

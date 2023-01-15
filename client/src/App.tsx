@@ -1,28 +1,16 @@
-<html>
-    <head>
-        <title>Pi</title>
-        <script src="lib/quagga.min.js"></script>
-        <script src="./productSearch.js"></script>
-        <style>
-            @media (orientation: landscape) {
-                video {
-                    height: 60%;
-                }
-            }
-            @media (orientation: portrait) {
-                video {
-                    width: 100%;
-                }
-            }
-        </style>
-    </head>
-    <body>
-        <div>
-            <h1 id="flags">Flags</h1>
-        </div>
-        <div id="qr-reader"></div>
-    </body>
-    <script>
+// @ts-nocheck
+import React, { useEffect, useState } from 'react';
+import './App.css';
+import { parseProductData } from './productSearch';
+import Quagga from 'quagga';
+import styled from 'styled-components';
+
+function App() {
+    const defaultColour = '#282c34';
+    const [flags, setFlags] = useState('No Ingredients Found');
+    const [colour, setColour] = useState('#282c34');
+
+    useEffect(() => {
         Quagga.init(
             {
                 numOfWorkers: 4,
@@ -49,7 +37,7 @@
                 Quagga.start();
             }
         );
-        var lastDetection;
+        var lastDetection: Number;
         Quagga.onDetected(function (result) {
             var code = result.codeResult.code;
             if (code == null || code == lastDetection) {
@@ -91,9 +79,48 @@
             //             }
             //         });
             let warningIngredients = parseProductData(cacheData[code]);
+            let flagRows = [
+                <>
+                    <h3>
+                        High Emission Ingredients Found: <br></br>
+                    </h3>
+                </>,
+            ];
             if (warningIngredients != null) {
-                document.getElementById('flags').innerText = warningIngredients;
+                warningIngredients.forEach((x) => {
+                    flagRows.push(
+                        <>
+                            {x}
+                            <br></br>
+                        </>
+                    );
+                });
+                flagRows.push(
+                    <a href="https://www.visualcapitalist.com/visualising-the-greenhouse-gas-impact-of-each-food/">
+                        Learn More
+                    </a>
+                );
+                setFlags(flagRows);
+                setColour('#aa3333');
+                setTimeout(() => setColour(defaultColour), 1000);
             }
         });
-    </script>
-</html>
+    }, []);
+
+    return (
+        <div className="App">
+            <header className="App-header" style={{ backgroundColor: colour }}>
+                <p>{flags}</p>
+            </header>
+            <QrReader id="qr-reader"></QrReader>
+        </div>
+    );
+}
+
+const QrReader = styled.div`
+    video {
+        height: 60%;
+    }
+`;
+
+export default App;
