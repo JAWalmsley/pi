@@ -1,86 +1,115 @@
-import React, {useEffect, useState} from 'react';
+// @ts-nocheck
+import React, { useEffect, useState } from 'react';
 import './App.css';
+import { parseProductData } from './productSearch';
 import Quagga from 'quagga';
-import styled from "styled-components";
+import styled from 'styled-components';
 
 function App() {
-  const [company, setCompany] = useState("test company");
-  const [score, setScore] = useState("test score");
-  const [blurb, setBlurb] = useState("test blurb");
-  const [upc, setUpc] = useState(null);
+    const defaultColour = '#282c34';
+    const [flags, setFlags] = useState('No Ingredients Found');
+    const [colour, setColour] = useState('#282c34');
 
-  useEffect(() => {
-    Quagga.init(
-      {
-        numOfWorkers: 4,
-        debug: true,
-        locate: true,
-        inputStream: {
-          name: 'Live',
-          type: 'LiveStream',
-          target: document.querySelector('#qr-reader'),
-        },
-        decoder: {
-          readers: ['upc_reader'],
-          debug: {
-            drawBoundingBox: true,
-            drawScanline: true,
-          },
-        },
-      },
-      function (err: any) {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        console.log('Initialization finished. Ready to start');
-        Quagga.start();
-      }
-    );
-
-    Quagga.onDetected(function (result: any) {
-      const code = result.codeResult.code;
-      // @ts-ignore
-      if (!(code in upc)) {
-        console.log('bad read');
-        return;
-      }
-      console.log(code);
-      // @ts-ignore
-      console.log(upc[code].company);
-      // @ts-ignore
-      fetch('https://nftstorage.link/ipfs/' + upc[code].ipfs)
-        .then((response) => response.json())
-        .then((json) => {
-          setCompany(json.name);
-          setScore(json.score);
-          setBlurb(json.blurb);
+    useEffect(() => {
+        Quagga.init(
+            {
+                numOfWorkers: 4,
+                debug: true,
+                locate: true,
+                inputStream: {
+                    name: 'Live',
+                    type: 'LiveStream',
+                    target: document.querySelector('#qr-reader'), // Or '#yourElement' (optional)
+                },
+                decoder: {
+                    readers: ['upc_reader'],
+                    debug: {
+                        drawBoundingBox: true,
+                        drawScanline: true,
+                    },
+                },
+            },
+            function (err) {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                Quagga.start();
+            }
+        );
+        var lastDetection: Number;
+        Quagga.onDetected(function (result) {
+            var code = result.codeResult.code;
+            if (code == null || code == lastDetection) {
+                return;
+            }
+            lastDetection = code;
+            var cacheData = {
+                '064100389014': {
+                    status: 1,
+                    product: {
+                        _keywords: ['rice', 'Kelloggs', 'square'],
+                        ingredients: [
+                            { text: 'rice' },
+                            { text: 'sugar' },
+                            { text: 'cereal' },
+                        ],
+                        brands: 'Kellogg',
+                    },
+                },
+                '063348100900': {
+                    status: 1,
+                    product: {
+                        _keywords: [],
+                        ingredients: [
+                            { text: 'chocolate' },
+                            { text: 'palm oil' },
+                        ],
+                        brands: 'Dare',
+                    },
+                },
+            };
+            //     fetch('https://world.openfoodfacts.org/api/v0/product/' + code)
+            //         .then((response) => response.json())
+            //         .then((json) => {
+            //             let warningIngredients = parseProductData(json);
+            //             if (warningIngredients != null) {
+            //                 document.getElementById('flags').innerText =
+            //                     warningIngredients;
+            //             }
+            //         });
+            let warningIngredients = parseProductData(cacheData[code]);
+            let flagRows = [];
+            if (warningIngredients != null) {
+                warningIngredients.forEach((x) => {
+                    flagRows.push(
+                        <>
+                            {x}
+                            <br></br>
+                        </>
+                    );
+                });
+                setFlags(flagRows);
+                setColour('#aa3333');
+                setTimeout(() => setColour(defaultColour), 1000);
+            }
         });
-    });
-  }, []);
+    }, []);
 
-  useEffect(() => {
-    fetch('UPC.json')
-      .then((response) => response.json())
-      .then((json) => (setUpc(json)));
-  });
-
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>{company}</p>
-        <p>{score}</p>
-        <p>{blurb}</p>
-      </header>
-      <QrReader id="qr-reader"></QrReader>
-    </div>
-  );
+    return (
+        <div className="App">
+            <header className="App-header" style={{ backgroundColor: colour }}>
+                <p>{flags}</p>
+            </header>
+            <QrReader id="qr-reader"></QrReader>
+        </div>
+    );
 }
 
 const QrReader = styled.div`
-  video {
-    height: 60%;
-  }
+    video {
+        height: 60%;
+    }
 `;
 
 export default App;
